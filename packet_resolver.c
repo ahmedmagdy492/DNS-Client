@@ -8,11 +8,8 @@
 
 #define MAX_WORDS 10
 
-
-void prepare_packet(int **packet, char *url, int* final_len)
+void prepare_packet(char **packet, char *url, int *final_len)
 {
-	char *fixed_part = "\xAA\xAA\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00";
-
 	// run the url parser
 	char *domain = parse_url(url);
 	int domain_len = strlen(domain);
@@ -40,39 +37,85 @@ void prepare_packet(int **packet, char *url, int* final_len)
 		}
 	}
 
+	int fixed_part_len = 12;
+
 	total_len += word_counter;
-	*final_len = strlen(fixed_part) + total_len;
-	*packet = (int *)malloc(sizeof(int) * (*final_len));
-	int packet_counter = 0;
+	// this literal 5 is for the type and the class
+	*final_len = fixed_part_len + total_len + 5;
+
+	*packet = (char *)malloc(sizeof(char) * (*final_len));
+
+	// adding the header part
+	// ID
+	int start_counter = 0;
+	(*packet)[start_counter] = 170;
+	start_counter++;
+	(*packet)[start_counter] = 170;
+	start_counter++;
+
+	// Query Params
+	(*packet)[start_counter] = 1;
+	start_counter++;
+	(*packet)[start_counter] = 0;
+	start_counter++;
+
+	// Number of Questions
+	(*packet)[start_counter] = 0;
+	start_counter++;
+	(*packet)[start_counter] = 1;
+	start_counter++;
+
+	// Number of Answers
+	(*packet)[start_counter] = 0;
+	start_counter++;
+	(*packet)[start_counter] = 0;
+	start_counter++;
+
+	// Number of Authority Records
+	(*packet)[start_counter] = 0;
+	start_counter++;
+	(*packet)[start_counter] = 0;
+	start_counter++;
+
+	// Number of Addtional Records
+	(*packet)[start_counter] = 0;
+	start_counter++;
+	(*packet)[start_counter] = 0;
+	start_counter++;
+
+	int packet_counter = start_counter;
 
 	for (int i = 0; i < MAX_WORDS; i++)
 	{
 		if (word_list[i] != NULL)
 		{
 			int word_len = strlen(word_list[i]);
-			char len_hex[2];
-			dec_to_hexa(word_len, len_hex);
-			rev_string(len_hex);
-			(*packet)[packet_counter] = atoi(len_hex);
+			(*packet)[packet_counter] = word_len;
 			packet_counter++;
 			for (int j = 0; j < word_len; j++)
 			{
 				if (word_list[i][j] != '.')
 				{
 					// converting each character to an int (ascii code)
-					char hex_number[2];
-					dec_to_hexa(word_list[i][j], hex_number);
-					rev_string(hex_number);
-					(*packet)[packet_counter] = atoi(hex_number);
+					(*packet)[packet_counter] = word_list[i][j];
 					packet_counter++;
 				}
 			}
 		}
 	}
 
-	for(int i = 0; i < MAX_WORDS; i++)
+	// zero byte to end the QName
+	(*packet)[packet_counter++] = 0;
+	// QType
+	(*packet)[packet_counter++] = 0;
+	(*packet)[packet_counter++] = 1;
+	// QClass
+	(*packet)[packet_counter++] = 0;
+	(*packet)[packet_counter] = 1;
+
+	for (int i = 0; i < MAX_WORDS; i++)
 	{
-		if(word_list[i] != NULL)
+		if (word_list[i] != NULL)
 		{
 			free(word_list[i]);
 		}
@@ -82,7 +125,6 @@ void prepare_packet(int **packet, char *url, int* final_len)
 	free(domain);
 }
 
-void resolve_packet(char* packet)
+void resolve_packet(char *packet)
 {
-    
 }

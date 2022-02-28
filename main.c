@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define PORT 53
-#define LOG 0
+#define LOG 1
 #define BUFFER_SIZE 4096
 
 #include "logger.h"
@@ -22,6 +22,8 @@ int main(int argc, char **argv)
 	char *packet = NULL;
 	int len = 0;
 	prepare_packet(&packet, argv[1], &len);
+
+	printf("%s\n", packet);
 
 	char* ip = "8.8.8.8";
 	init(ip, PORT);
