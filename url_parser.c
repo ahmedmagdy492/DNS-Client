@@ -1,10 +1,12 @@
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "url_parser.h"
 
 char *create_string(char *str, int start, int end)
 {
+	printf("from create string: recievied str is %s\n", str);
 	char *new_str = (char *)malloc(sizeof(char) * (end - start));
 	int j = 0;
 	for (int i = start; i <= end; i++)
@@ -17,6 +19,7 @@ char *create_string(char *str, int start, int end)
 
 char *parse_url(char *url)
 {
+	printf("from parse url: url has the value of %s\n", url);
 	int len = strlen(url);
 	for (int i = 0; i < len; i++)
 	{

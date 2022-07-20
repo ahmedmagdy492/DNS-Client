@@ -12,6 +12,7 @@ void prepare_packet(char **packet, char *url, int *final_len)
 {
 	// run the url parser
 	char *domain = parse_url(url);
+	printf("from prepare_packet: domain returned is %s\n", domain);
 	int domain_len = strlen(domain);
 	char **word_list = (char **)malloc(sizeof(long long) * MAX_WORDS);
 
@@ -118,11 +119,12 @@ void prepare_packet(char **packet, char *url, int *final_len)
 		if (word_list[i] != NULL)
 		{
 			free(word_list[i]);
+			printf("finished %d out of %d\n", i, MAX_WORDS);
 		}
 	}
-
+	
 	free(word_list);
-	free(domain);
+	printf("Freed Word List success\n");
 }
 
 void resolve_packet(char *packet)
